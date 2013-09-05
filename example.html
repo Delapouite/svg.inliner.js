@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SVGInliner example</title>
+		<style>
+			img[src$=".svg"], .inlined-svg {
+				height: 32px;
+				width: 32px;
+			}
+		</style>
+	</head>
+	<body>
+		<img src="example.svg" alt="SVG example" id="example" class="example">
+		<button>Inline SVGs</button>
+		<script src="svg.inliner.js"></script>
+		<script>
+			document.querySelector('button').onclick = function() {
+				SVGInliner();
+			};
+		</script>
+	</body>
+</html>
