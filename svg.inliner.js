@@ -1,4 +1,5 @@
 (function(root, factory) {
+	// UMD boileplate
 	if (typeof exports === 'object') {
 		module.exports = factory();
 	} else if (typeof define === 'function' && define.amd) {
@@ -8,6 +9,7 @@
 	}
 }(this, function() {
 
+	// XHR helper
 	function request(URI, success) {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', URI);
@@ -23,20 +25,43 @@
 		xhr.send();
 	}
 
-	return function(selector) {
-		var i, image, images = document.querySelectorAll(selector || 'img[src$=".svg"]');
-		if (!images.length) return;
+	return function(selector, next) {
+		var i,
+			svgs = [],
+			images = document.querySelectorAll(selector || 'img[src$=".svg"]'),
+			length = images.length,
+			replacements = 0;
 
-		for (i = 0; i < images.length; i++) {
-			image = images[i];
-			if (!image.src || !image.src.match(/\.svg$/)) return;
+		// error, no images found
+		if (!length) {
+			if (next)
+				next('No images found');
 
-			request(image.src, function(xhr) {
-				var svg = document.importNode(xhr.responseXML.firstChild);
-				if (image.id) svg.id = image.id;
-				svg.setAttribute('class', (image.className ? image.className : '') + ' inlined-svg');
-				image.parentNode.replaceChild(svg, image);
-			});
+			return;
+		}
+
+		for (i = 0; i < length; i++) {
+			(function(image) {
+				// error, not a svg
+				if (!image.src || !image.src.match(/\.svg$/))
+					return replacements++;
+
+				request(image.src, function(xhr) {
+					var svg = document.importNode(xhr.responseXML.firstChild);
+
+					// keep original ID and CSS classes
+					if (image.id) svg.id = image.id;
+					svg.setAttribute('class', (image.className ? image.className : '') + ' inlined-svg');
+					image.parentNode.replaceChild(svg, image);
+
+					svgs.push(svg);
+					replacements++;
+					// trigger callback if provided with svgs
+					if (next && replacements === length)
+						next(null, svgs);
+
+				});
+			})(images[i]);
 		}
 	};
 }));

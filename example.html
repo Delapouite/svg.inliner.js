@@ -4,18 +4,27 @@
 		<title>SVGInliner example</title>
 		<style>
 			img[src$=".svg"], .inlined-svg {
-				height: 32px;
-				width: 32px;
+				height: 64px;
+				width: 64px;
 			}
 		</style>
 	</head>
 	<body>
-		<img src="example.svg" alt="SVG example" id="example" class="example">
+		<img src="images/powder.svg" alt="Powder" id="powder" class="icon">
+		<img src="images/roast-chicken.svg" alt="Roast chicken" id="roast-chicken" class="icon">
 		<button>Inline SVGs</button>
 		<script src="svg.inliner.js"></script>
 		<script>
 			document.querySelector('button').onclick = function() {
-				SVGInliner();
+				SVGInliner(null, function(err, svgs) {
+					if (err) return console.warn(err);
+
+					// set background to random color
+					for (var i = 0; i < svgs.length; i++) {
+						svgs[i].firstElementChild.style.fill = (Math.random().toString(16) + '000000').slice(2, 8);
+					}
+					console.log('Done', svgs);
+				});
 			};
 		</script>
 	</body>
