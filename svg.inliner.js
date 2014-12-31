@@ -8,13 +8,14 @@
 		root.SVGInliner = factory();
 	}
 }(this, function() {
+	'use strict';
 
 	// XHR helper
 	function request(URI, success) {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', URI);
 		xhr.onreadystatechange = function() {
-			if (this.readyState !== 4) return;
+			if (this.readyState !== XMLHttpRequest.DONE) return;
 
 			if (this.status === 200) {
 				success(this);
@@ -47,7 +48,7 @@
 					return replacements++;
 
 				request(image.src, function(xhr) {
-					var svg = document.importNode(xhr.responseXML.firstChild);
+					var svg = document.importNode(xhr.responseXML.firstChild, true);
 
 					// keep original ID and CSS classes
 					if (image.id) svg.id = image.id;
